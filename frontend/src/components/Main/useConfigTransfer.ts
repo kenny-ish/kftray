@@ -5,7 +5,7 @@ import { open, save } from '@tauri-apps/plugin-dialog'
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 
 import { toaster } from '@/components/ui/toaster'
-import { configsQuery } from '@/hooks/useConfigs'
+import { invalidateConfigQueries } from '@/hooks/invalidateConfigQueries'
 import { withNativeDialog } from '@/lib/nativeDialog'
 import { invoke } from '@/lib/tauri'
 
@@ -61,7 +61,7 @@ export function useConfigTransfer() {
       const json = await readTextFile(selected)
 
       await invoke('import_configs_cmd', { json })
-      await queryClient.invalidateQueries({ queryKey: configsQuery.queryKey })
+      await invalidateConfigQueries(queryClient)
 
       return true
     },

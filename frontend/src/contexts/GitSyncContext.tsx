@@ -15,7 +15,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { configsQuery } from '@/hooks/useConfigs'
+import { invalidateConfigQueries } from '@/hooks/invalidateConfigQueries'
 import type { GitConfig } from '@/services/gitService'
 import { gitService } from '@/services/gitService'
 
@@ -59,9 +59,9 @@ export function GitSyncProvider({ children }: { children: ReactNode }) {
     mutationKey: syncMutationKey,
     scope: syncScope,
     mutationFn: (creds: GitConfig) => gitService.importConfigs(creds),
-    onSuccess: () => {
+    onSuccess: async () => {
       setLastSyncTime(Date.now())
-      queryClient.invalidateQueries({ queryKey: configsQuery.queryKey })
+      await invalidateConfigQueries(queryClient)
     },
     meta: { errorToast: { title: 'Sync Failed', duration: 3000 } },
   })
@@ -75,9 +75,9 @@ export function GitSyncProvider({ children }: { children: ReactNode }) {
 
       return creds
     },
-    onSuccess: creds => {
+    onSuccess: async creds => {
       queryClient.setQueryData(credentialsQueryKey, creds)
-      queryClient.invalidateQueries({ queryKey: configsQuery.queryKey })
+      await invalidateConfigQueries(queryClient)
       setLastSyncTime(Date.now())
     },
     meta: { errorToast: { title: 'Error saving settings', duration: 1000 } },

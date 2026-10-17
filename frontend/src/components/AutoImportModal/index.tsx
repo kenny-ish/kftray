@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dialog'
 import { selectStyles } from '@/components/ui/select-styles'
 import { toaster } from '@/components/ui/toaster'
-import { configsQuery } from '@/hooks/useConfigs'
+import { invalidateConfigQueries } from '@/hooks/invalidateConfigQueries'
 import { useKubeContexts } from '@/hooks/useKube'
 import {
   DEFAULT_KUBECONFIG,
@@ -86,8 +86,8 @@ export function AutoImportModal({ onClose }: AutoImportModalProps) {
         aliasAsDomain,
         autoLoopback: enableAutoLoopback,
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: configsQuery.queryKey })
+    onSuccess: async () => {
+      await invalidateConfigQueries(queryClient)
       toaster.success({
         title: 'Success',
         description: 'Configs imported successfully.',
